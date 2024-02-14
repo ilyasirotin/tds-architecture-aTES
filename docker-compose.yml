@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  traefik:
+    restart: on-failure
+    image: traefik:latest
+    container_name: "traefik"
+    volumes:
+      - "./docker/traefik/conf/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./var/log/traefik:/var/log/traefik:rw,Z"
+    ports:
+      - "80:80"
+    networks:
+      - no-internet
+      - internet
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik.entryPoints=http
+      - traefik.http.services.traefik.loadBalancer.server.port=8080
+
+  rabbit:
+    restart: on-failure
+    image: rabbitmq:3.13.0-rc.4-management-alpine
+    container_name: "rabbit"
+    hostname: "rabbit"
+    volumes:
+      - "rabbitmq-data:/var/lib/rabbitmq:rw"
+    networks:
+      - no-internet
+      - traefik-public
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.localhost`)
+      - traefik.http.routers.rabbitmq.entryPoints=http
+      - traefik.http.services.rabbitmq.loadBalancer.server.port=15672
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: "mailpit"
+    restart: always
+    volumes:
+      - "mailpit-data:/data:rw"
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      TZ: ${TZ}
+    networks:
+      - no-internet
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.mailpit.rule=Host(`mailpit.localhost`)
+      - traefik.http.routers.mailpit.entryPoints=http
+      - traefik.http.services.mailpit.loadBalancer.server.port=8025
+
+volumes:
+  rabbitmq-data:
+  mailpit-data:
+
+networks:
+  no-internet:
+    name: "no-internet"
+    driver: bridge
+    internal: true
+  internet:
+    name: "internet"
+    internal: false
+  traefik-public:
+    name: "traefik-public"
