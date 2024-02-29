@@ -2,13 +2,16 @@
 
 DOCKER_COMPOSE ?= docker compose
 
-.prepare:
-	cp -n docker-compose.override.yml.tmpl docker-compose.override.yml
+docker-prepare:
+	@if [ ! -e docker-compose.override.yml ]; then \
+  		cp docker-compose.override.yml.tmpl docker-compose.override.yml; \
+  	fi
+.PHONY: docker-prepare
 
 .env:
 	cp -n .env.tmpl .env
 
-up: .env .prepare
+up: .env docker-prepare
 	$(DOCKER_COMPOSE) up -d
 .PHONY: up
 
