@@ -32,11 +32,12 @@ services:
     networks:
       - internet
       - no-internet
+      - services-proxy
 
   pg:
-    restart: on-failure
+    restart: always
     container_name: "${APP_NAME}-postgres"
-    image: postgres:alpine
+    image: postgres:16.2-alpine
     volumes:
       - "pg-data:/var/lib/postgresql/data:rw"
     environment:
@@ -46,8 +47,8 @@ services:
     ports:
       - "${PG_EXPOSED_PORT}:5432"
     networks:
-      - no-internet
       - internet
+      - no-internet
 
   redis:
     restart: on-failure
@@ -78,3 +79,6 @@ networks:
     internal: true
   internet:
     internal: false
+  services-proxy:
+    name: "services-proxy"
+    external: true
