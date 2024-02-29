@@ -7,7 +7,7 @@ services:
     container_name: "${APP_NAME}"
     volumes:
       - "./docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
-      - "./src:/app:ro,Z"
+      - "./:/app:ro,Z"
       - "caddy-data:/data:rw"
     networks:
       - no-internet
@@ -24,7 +24,7 @@ services:
     environment:
       PHP_IDE_CONFIG: serverName=${PHPSTORM_DEBUG_SERVER_NAME}
     volumes:
-      - "./src:/app:rw,Z"
+      - "./:/app:rw,Z"
     depends_on:
       - pg
     ports:

@@ -1,4 +1,4 @@
-FROM php:8.1.27-fpm-alpine
+FROM php:8.2.16-fpm-alpine
 
 ENV XDEBUG_VERSION 3.3.1
 
@@ -22,6 +22,7 @@ RUN apk add --update --no-cache \
         icu-dev \
         icu-data-full \
         rabbitmq-c-dev \
+        librdkafka-dev \
     && git clone --branch $XDEBUG_VERSION --depth 1 https://github.com/xdebug/xdebug.git /usr/src/php/ext/xdebug \
     && docker-php-ext-configure \
         xdebug --enable-xdebug-dev \
@@ -43,7 +44,7 @@ RUN apk add --update --no-cache \
         intl \
         sodium \
         opcache \
-    && pecl install redis amqp \
+    && pecl install redis amqp rdkafka \
     && docker-php-ext-enable \
         gd \
         xdebug \
@@ -55,6 +56,7 @@ RUN apk add --update --no-cache \
         opcache \
         redis.so \
         amqp \
+        rdkafka \
     && apk del --no-cache \
         git
 
