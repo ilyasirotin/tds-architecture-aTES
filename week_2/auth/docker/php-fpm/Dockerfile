@@ -5,6 +5,7 @@ ENV XDEBUG_VERSION 3.3.1
 ENV MUSL_LOCPATH /usr/share/i18n/locales/musl
 
 RUN apk add --update --no-cache \
+        bash \
         pcre-dev $PHPIZE_DEPS \
         fcgi \
         git \
@@ -67,6 +68,8 @@ COPY ./php-fpm/conf.d /usr/local/etc/php/conf.d
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer --quiet
 
 RUN addgroup -g 1000 dev && adduser -u 1000 -G dev -s /bin/sh -D dev
+
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash && apk add symfony-cli
 
 WORKDIR /app
 

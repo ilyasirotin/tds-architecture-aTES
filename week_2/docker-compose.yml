@@ -32,6 +32,7 @@ services:
     networks:
       - no-internet
       - traefik-public
+      - services-proxy
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
@@ -57,6 +58,7 @@ services:
     networks:
       - no-internet
       - traefik-public
+      - services-proxy
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
@@ -70,11 +72,12 @@ volumes:
 
 networks:
   no-internet:
-    name: "no-internet"
-    driver: bridge
     internal: true
   internet:
-    name: "internet"
     internal: false
   traefik-public:
     name: "traefik-public"
+  services-proxy:
+    name: "services-proxy"
+    internal: true
+    driver: bridge
