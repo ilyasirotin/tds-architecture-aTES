@@ -17,6 +17,9 @@ gen-keys:
 	openssl rsa -in $(OAUTH_PRIVATE_KEY) -passin pass:$(OAUTH_PASSPHRASE) -pubout -out $(OAUTH_PUBLIC_KEY)
 .PHONY: gen-keys
 
+doctrine-migrate:
+	$(DOCKER_COMPOSE) exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
+
 .env:
 	cp -n .env.tmpl .env
 
@@ -43,7 +46,7 @@ ssh:
 	$(DOCKER_COMPOSE) exec -it php-fpm sh
 .PHONY: ssh
 
-init: build up composer-install gen-keys
+init: build up composer-install gen-keys doctrine-migrate
 .PHONY: init
 
 composer-install:
