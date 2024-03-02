@@ -29,8 +29,22 @@ security:
                 enable_csrf: true
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
+                target: app_login
+
+    role_hierarchy:
+      ROLE_USER: [ROLE_EMAIL, ROLE_PROFILE]
+      ROLE_MANAGER: ROLE_EMAIL
+      ROLE_ACCOUNTANT: ROLE_MANAGER
+      ROLE_ADMIN: [ROLE_MANAGER, ROLE_ACCOUNTANT]
+
+    access_control:
+      - { path: ^/register, roles: PUBLIC_ACCESS }
+      - { path: ^/authorize, roles: PUBLIC_ACCESS }
+      - { path: ^/login, role: PUBLIC_ACCESS }
+      - { path: ^/token, role: PUBLIC_ACCESS }
+      - { path: ^/.well-known, roles: PUBLIC_ACCESS }
+      - { path: ^/api/test, role: ROLE_OAUTH2_EMAIL }
+      - { path: ^/, role: ROLE_USER }
 
 when@test:
     security:
