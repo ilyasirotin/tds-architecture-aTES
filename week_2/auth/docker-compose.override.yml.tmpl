@@ -21,7 +21,15 @@ services:
       - traefik.http.routers.$APP_NAME-redis.entryPoints=http
       - traefik.http.services.$APP_NAME-redis.loadBalancer.server.port=8081
 
+  php-fpm:
+    networks:
+        - services-proxy
+
 networks:
   traefik-public:
     name: "traefik-public"
     external: true
+  services-proxy:
+    name: "services-proxy"
+    external: true
+    driver: bridge
