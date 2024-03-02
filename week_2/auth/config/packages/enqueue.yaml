@@ -1,0 +1,11 @@
+enqueue:
+    default:
+        transport:
+          dsn: '%env(resolve:ENQUEUE_DSN)%'
+          global:
+            group.id: 'auth'
+            metadata.broker.list: '%env(resolve:KAFKA_BROKER_LIST)%'
+          topic:
+            auto.offset.reset: beginning
+          commit_async: true
+        client: null
