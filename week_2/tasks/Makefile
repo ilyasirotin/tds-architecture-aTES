@@ -40,7 +40,7 @@ ssh:
 	$(DOCKER_COMPOSE) exec -it php-fpm sh
 .PHONY: ssh
 
-init: build up composer-install
+init: build up composer-install doctrine-migrate
 .PHONY: init
 
 composer-install:
