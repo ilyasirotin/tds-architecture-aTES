@@ -6,16 +6,11 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use DateTime;
-use DateTimeImmutable;
-use Doctrine\DBAL\Types\DateTimeImmutableType;
-use Doctrine\DBAL\Types\DateTimeType;
-use Doctrine\DBAL\Types\DateType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -130,9 +125,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return list<string>
      * @see UserInterface
      *
-     * @return list<string>
      */
     public function getRoles(): array
     {

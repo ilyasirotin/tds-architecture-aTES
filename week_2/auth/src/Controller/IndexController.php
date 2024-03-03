@@ -11,18 +11,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class IndexController extends AbstractController
 {
-    private Security $security;
-
-    public function __construct(Security $security)
-    {
-        $this->security = $security;
-    }
-
     #[Route('/', name: 'app_index')]
     public function index(): Response
     {
-        return $this->render('index/index.html.twig', [
-            'controller_name' => 'IndexController',
-        ]);
+        return $this->render('index/index.html.twig');
     }
 }
