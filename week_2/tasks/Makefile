@@ -40,7 +40,11 @@ ssh:
 	$(DOCKER_COMPOSE) exec -it php-fpm sh
 .PHONY: ssh
 
-init: build up composer-install doctrine-migrate
+consumer-start:
+	$(DOCKER_COMPOSE) exec -it -d php-fpm symfony console messenger:consume async
+.PHONY: consumer-start
+
+init: build up composer-install doctrine-migrate consumer-start
 .PHONY: init
 
 composer-install:
