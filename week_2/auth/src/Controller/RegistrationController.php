@@ -6,21 +6,25 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Message\UserCreatedMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class RegistrationController extends AbstractController
 {
     private Security $security;
+    private MessageBusInterface $bus;
 
-    public function __construct(Security $security)
+    public function __construct(Security $security, MessageBusInterface $bus)
     {
         $this->security = $security;
+        $this->bus = $bus;
     }
 
     #[Route('/register', name: 'app_register')]
@@ -49,7 +53,9 @@ class RegistrationController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
-            // do anything else you need here, like send an email
+
+            // Produce user created event
+            $this->bus->dispatch(new UserCreatedMessage($user));
 
             return $this->redirectToRoute('app_index');
         }
