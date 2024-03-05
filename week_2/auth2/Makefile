@@ -23,7 +23,7 @@ doctrine-migrate:
 oauth2-create-clients:
 	$(DOCKER_COMPOSE) exec php-fpm php bin/console league:oauth2-server:create-client \
 		--redirect-uri=http://tasks.localhost/auth/callback \
-		--grant-type=authorization_code --scope=email \
+		--grant-type=authorization_code --scope="uuid, email" \
         tasks_auth_client
 
 .env:

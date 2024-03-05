@@ -22,11 +22,17 @@ class ApiController extends AbstractController
     #[Route('/api/user', name: 'app_api')]
     public function index(): Response
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
 
         return $this->json([
-            'uuid' => $user->getUserIdentifier(),
+            "test" => "test"
         ]);
+
+//        /** @var User $user */
+//        $user = $this->security->getUser();
+//
+//        return $this->json([
+//            'email' => $user->getEmail(),
+//            'uuid' => $user->getUserIdentifier(),
+//        ]);
     }
 }

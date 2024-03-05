@@ -11,22 +11,22 @@ final class AuthProvider extends AbstractProvider
 {
     public function getBaseAuthorizationUrl(): string
     {
-        return 'http://auth.localhost/authorize';
+        return 'http://auth2.localhost/authorize';
     }
 
     public function getBaseAccessTokenUrl(array $params): string
     {
-        return 'http://auth/token';
+        return 'http://auth2/token';
     }
 
     public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
-        return 'http://auth/api/user';
+        return 'http://auth2/api/user';
     }
 
     protected function getDefaultScopes(): array
     {
-        return ['email'];
+        return ['uuid', 'email'];
     }
 
     protected function checkResponse(ResponseInterface $response, $data)

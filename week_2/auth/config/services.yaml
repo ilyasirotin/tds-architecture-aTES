@@ -5,6 +5,13 @@ services:
         autowire: true
         autoconfigure: true
 
+    League\Bundle\OAuth2ServerBundle\Entity\AccessToken:
+      class: App\Entity\AccessToken
+
+    League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface:
+      class: App\Repository\AccessTokenRepository
+      decorates: 'League\Bundle\OAuth2ServerBundle\Repository\AccessTokenRepository'
+
     App\:
         resource: '../src/'
         exclude:

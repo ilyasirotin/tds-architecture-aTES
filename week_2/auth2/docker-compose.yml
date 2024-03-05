@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  caddy:
+    image:  caddy:2.7.6-alpine
+    restart: on-failure
+    container_name: "${APP_NAME}"
+    volumes:
+      - "./docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
+      - "./:/app:ro,Z"
+      - "caddy-data:/data:rw"
+    networks:
+      - no-internet
+      - services-proxy
+    depends_on:
+      - php-fpm
+
+  php-fpm:
+    restart: on-failure
+    image: "php-fpm"
+    container_name: "${APP_NAME}-php-fpm"
+    build:
+      context: "./docker"
+      dockerfile: php-fpm/Dockerfile
+    environment:
+      PHP_IDE_CONFIG: serverName=${PHPSTORM_DEBUG_SERVER_NAME}
+    volumes:
+      - "./:/app:rw,Z"
+    depends_on:
+      - pg
+    ports:
+      - "${XDEBUG_EXPOSED_PORT}:9003"
+    networks:
+      - internet
+      - no-internet
+      - services-proxy
+
+  pg:
+    restart: always
+    container_name: "${APP_NAME}-postgres"
+    image: postgres:16.2-alpine
+    volumes:
+      - "pg-data:/var/lib/postgresql/data:rw"
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    ports:
+      - "${PG_EXPOSED_PORT}:5432"
+    networks:
+      - internet
+      - no-internet
+
+  redis:
+    restart: on-failure
+    image: redis:alpine
+    hostname: redis
+    container_name: "${APP_NAME}-redis"
+    networks:
+      - no-internet
+
+  redis-commander:
+    restart: always
+    container_name: "${APP_NAME}-redis-commander"
+    image: ghcr.io/joeferner/redis-commander:latest
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOSTS: dev:redis:6379
+    networks:
+      - no-internet
+
+volumes:
+  pg-data:
+  caddy-data:
+
+networks:
+  no-internet:
+    driver: bridge
+    internal: true
+  internet:
+    internal: false
+  services-proxy:
+    name: "services-proxy"
+    external: true
