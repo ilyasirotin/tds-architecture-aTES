@@ -10,9 +10,9 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         # used to reload user from session & other features (e.g. switch_user)
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+        api_token:
+          pattern: ^/api/token$
+          security: false
 
         api:
           pattern: ^/api
@@ -20,16 +20,22 @@ security:
           stateless: true
           oauth2: true
 
+        dev:
+          pattern: ^/(_(profiler|wdt)|css|images|js)/
+          security: false
+
         main:
             lazy: true
             provider: app_user_provider
             form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
+              login_path: app_login
+              check_path: app_login
+              enable_csrf: true
+              default_target_path: app_index
+              use_referer: true
             logout:
-                path: app_logout
-                target: app_login
+              path: app_logout
+              target: app_index
 
     role_hierarchy:
       ROLE_USER: [ROLE_EMAIL, ROLE_PROFILE]
@@ -43,7 +49,7 @@ security:
       - { path: ^/login, role: PUBLIC_ACCESS }
       - { path: ^/token, role: PUBLIC_ACCESS }
       - { path: ^/.well-known, roles: PUBLIC_ACCESS }
-      - { path: ^/api/test, role: ROLE_OAUTH2_EMAIL }
+      - { path: ^/api/user, role: ROLE_OAUTH2_EMAIL }
       - { path: ^/, role: ROLE_USER }
 
 when@test:
