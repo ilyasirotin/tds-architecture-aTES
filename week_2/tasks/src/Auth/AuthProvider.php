@@ -1,30 +1,30 @@
 <?php
 
-namespace App;
+namespace App\Auth;
 
 use App\Entity\User;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseInterface;
 
-final class PopugAuthProvider extends AbstractProvider
+final class AuthProvider extends AbstractProvider
 {
-    public function getBaseAuthorizationUrl()
+    public function getBaseAuthorizationUrl(): string
     {
-        return getenv('OAUTH2_AUTHORIZATION_URL');
+        return 'http://auth.localhost/authorize';
     }
 
-    public function getBaseAccessTokenUrl(array $params)
+    public function getBaseAccessTokenUrl(array $params): string
     {
-        return getenv('OAUTH2_ACCESS_TOKEN_URL');
+        return 'http://auth/token';
     }
 
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
-        return getenv('OAUTH2_USER_RESOURCES_URL');
+        return 'http://auth/api/user';
     }
 
-    protected function getDefaultScopes()
+    protected function getDefaultScopes(): array
     {
         return ['email'];
     }

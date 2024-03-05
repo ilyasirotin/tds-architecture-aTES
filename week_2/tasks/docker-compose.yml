@@ -11,6 +11,7 @@ services:
       - "caddy-data:/data:rw"
     networks:
       - no-internet
+      - services-proxy
     depends_on:
       - php-fpm
 

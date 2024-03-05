@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Auth;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Uid\Uuid;
 
-class PopugAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
+class Authenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
     private $clientRegistry;
     private $entityManager;
@@ -37,13 +37,15 @@ class PopugAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function supports(Request $request): ?bool
     {
-        return $request->attributes->get('_route') === 'app_popug_callback';
+        return $request->attributes->get('_route') === 'app_auth_callback';
     }
 
     public function authenticate(Request $request): Passport
     {
         $client = $this->clientRegistry->getClient('popug_oauth');
         $accessToken = $this->fetchAccessToken($client);
+
+        dump($accessToken);
 
         return new SelfValidatingPassport(
             new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
@@ -72,7 +74,7 @@ class PopugAuthenticator extends OAuth2Authenticator implements AuthenticationEn
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return new RedirectResponse(
-            '/login/',
+            '/auth/',
             Response::HTTP_TEMPORARY_REDIRECT
         );
     }
