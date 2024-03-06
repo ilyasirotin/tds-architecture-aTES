@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -11,9 +9,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -22,17 +22,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private ?Uuid $publicId = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $isActive = null;
+
+    #[ORM\Column(length: 180)]
     private ?string $email = null;
 
     #[ORM\Column(length: 256, unique: false, nullable: true)]
     private ?string $username = null;
 
-    #[ORM\Column(type: 'uuid', unique: true)]
-    private ?Uuid $uuid = null;
-
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $active = null;
 
     /**
      * @var list<string> The user roles
@@ -54,7 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->uuid = Uuid::v7();
+        $this->publicId = Uuid::v7();
         $this->activate();
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
@@ -63,16 +64,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $username): void
-    {
-        $this->username = $username;
     }
 
     public function getEmail(): ?string
@@ -87,33 +78,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUuid(): ?Uuid
-    {
-        return $this->uuid;
-    }
-
-    public function setUuid(Uuid $uuid): self
-    {
-        $this->uuid = $uuid;
-
-        return $this;
-    }
-
-    public function isActive(): bool
-    {
-        return $this->active;
-    }
-
-    public function activate(): void
-    {
-        $this->active = true;
-    }
-
-    public function deactivate(): void
-    {
-        $this->active = false;
-    }
-
     /**
      * A visual identifier that represents this user.
      *
@@ -121,13 +85,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return $this->uuid->toRfc4122();
+        return (string) $this->email;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
     }
 
     /**
-     * @return list<string>
      * @see UserInterface
      *
+     * @return list<string>
      */
     public function getRoles(): array
     {
@@ -163,12 +137,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPublicId(): ?Uuid
+    {
+        return $this->publicId;
+    }
+
+    public function setPublicId(Uuid $uuid): void
+    {
+        $this->publicId = $uuid;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function activate(): void
+    {
+        $this->isActive = true;
+    }
+
+    public function deactivate(): void
+    {
+        $this->isActive = false;
+    }
+
     public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
 
-    public function setUpdatedAt(DateTime $dateTime)
+    public function setUpdatedAt(DateTime $dateTime): void
     {
         $this->updatedAt = $dateTime;
     }
@@ -183,7 +182,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 }

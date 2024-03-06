@@ -11,20 +11,22 @@ docker-prepare:
   	fi
 .PHONY: docker-prepare
 
-gen-keys:
+doctrine-migrate:
+	$(DOCKER_COMPOSE) exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
+.PHONY: doctrine-migrate
+
+oauth2-gen-keys:
 	@rm -rf var/keys && mkdir var/keys
 	openssl genrsa -out $(OAUTH_PRIVATE_KEY) 2048
 	openssl rsa -in $(OAUTH_PRIVATE_KEY) -pubout -out $(OAUTH_PUBLIC_KEY)
-.PHONY: gen-keys
-
-doctrine-migrate:
-	$(DOCKER_COMPOSE) exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
+.PHONY: oauth2-gen-keys
 
 oauth2-create-clients:
 	$(DOCKER_COMPOSE) exec php-fpm php bin/console league:oauth2-server:create-client \
-		--redirect-uri=http://tasks.localhost/auth/callback \
-		--grant-type=authorization_code --scope=email \
+		--redirect-uri=http://tasks.localhost/ \
+		--grant-type=authorization_code --scope="email, profile" \
         tasks_auth_client
+.PHONY: oauth2-create-clients
 
 .env:
 	cp -n .env.tmpl .env
@@ -52,7 +54,7 @@ ssh:
 	$(DOCKER_COMPOSE) exec -it php-fpm sh
 .PHONY: ssh
 
-init: build up composer-install gen-keys doctrine-migrate oauth2-create-clients
+init: build up composer-install doctrine-migrate oauth2-gen-keys oauth2-create-clients
 .PHONY: init
 
 composer-install:

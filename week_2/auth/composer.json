@@ -9,34 +9,25 @@
         "ext-iconv": "*",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.11",
-        "doctrine/doctrine-migrations-bundle": "^3.0",
-        "doctrine/migrations": "^3.7",
+        "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.18",
-        "league/oauth2-server": "^8.5",
         "league/oauth2-server-bundle": "^0.6.0",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.26",
-        "symfony/amqp-messenger": "6.4.*",
         "symfony/console": "6.4.*",
-        "symfony/doctrine-messenger": "6.4.*",
         "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
         "symfony/form": "6.4.*",
         "symfony/framework-bundle": "6.4.*",
-        "symfony/http-foundation": "6.4.*",
-        "symfony/messenger": "6.4.*",
         "symfony/property-access": "6.4.*",
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "6.4.*",
-        "symfony/security-csrf": "6.4.*",
         "symfony/serializer": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
         "symfony/uid": "6.4.*",
         "symfony/validator": "6.4.*",
-        "symfony/yaml": "6.4.*",
-        "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "symfony/yaml": "6.4.*"
     },
     "config": {
         "allow-plugins": {
@@ -89,8 +80,8 @@
     },
     "require-dev": {
         "symfony/debug-bundle": "6.4.*",
-        "symfony/maker-bundle": "^1.55",
-        "symfony/var-dumper": "6.4.*",
+        "symfony/maker-bundle": "^1.56",
+        "symfony/stopwatch": "6.4.*",
         "symfony/web-profiler-bundle": "6.4.*"
     }
 }
