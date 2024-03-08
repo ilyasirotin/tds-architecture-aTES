@@ -22,10 +22,10 @@ class AuthorizationCodeSubscriber implements EventSubscriberInterface
     private $firewallName;
 
     public function __construct(
-        Security $security,
+        Security              $security,
         UrlGeneratorInterface $urlGenerator,
-        RequestStack $requestStack,
-        FirewallMapInterface $firewallMap
+        RequestStack          $requestStack,
+        FirewallMapInterface  $firewallMap
     )
     {
         $this->security = $security;

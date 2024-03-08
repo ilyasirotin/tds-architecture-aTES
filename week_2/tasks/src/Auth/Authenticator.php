@@ -73,7 +73,7 @@ class Authenticator extends OAuth2Authenticator implements AuthenticationEntryPo
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return new RedirectResponse(
-            '/auth/',
+            '/auth',
             Response::HTTP_TEMPORARY_REDIRECT
         );
     }

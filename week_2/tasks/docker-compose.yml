@@ -16,7 +16,7 @@ services:
       - php-fpm
 
   php-fpm:
-    restart: on-failure
+    restart: always
     image: "php-fpm"
     container_name: "${APP_NAME}-php-fpm"
     build:

@@ -23,8 +23,8 @@ oauth2-gen-keys:
 
 oauth2-create-clients:
 	$(DOCKER_COMPOSE) exec php-fpm php bin/console league:oauth2-server:create-client \
-		--redirect-uri=http://tasks.localhost/ \
-		--grant-type=authorization_code --scope="email, profile" \
+		--redirect-uri=http://tasks.localhost/auth/callback \
+		--grant-type=authorization_code --scope="email" --scope="public_id" --scope="profile" \
         tasks_auth_client
 .PHONY: oauth2-create-clients
 

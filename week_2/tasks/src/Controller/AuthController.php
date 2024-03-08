@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AuthController extends AbstractController
 {
-    #[Route('/auth', name: 'app_auth')]
-    public function auth(ClientRegistry $clientRegistry)
+    #[Route('/login', name: 'app_auth')]
+    public function auth(ClientRegistry $clientRegistry): Response
     {
         return $clientRegistry
             ->getClient('popug_oauth')
@@ -17,10 +19,8 @@ class AuthController extends AbstractController
     }
 
     #[Route('/auth/callback', name: 'app_auth_callback')]
-    public function callback()
+    public function callback(Request $request): Response
     {
-        /**
-         * All logic implemented in symfony authenticator
-         */
+        return $this->json($request);
     }
 }

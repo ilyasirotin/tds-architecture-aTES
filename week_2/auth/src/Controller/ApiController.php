@@ -11,9 +11,6 @@ class ApiController extends AbstractController
     #[Route('/api/user', name: 'app_api')]
     public function index(): Response
     {
-        return $this->json([
-            'uuid' => $this->getUser()->getUserIdentifier(),
-            'email' => $this->getUser()->getEmail(),
-        ]);
+        return $this->json($this->getUser());
     }
 }

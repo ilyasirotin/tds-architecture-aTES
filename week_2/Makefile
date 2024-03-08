@@ -8,7 +8,7 @@ up: .env
 .PHONY: up
 
 up-all: up
-	(cd ./auth2/ && make init) && (cd ./tasks/ && make init)
+	(cd ./auth/ && make init) && (cd ./tasks/ && make init)
 .PHONY: up-all
 
 down:
@@ -20,7 +20,7 @@ down-clear:
 .PHONY: down-clear
 
 down-clear-all:
-	(cd ./auth2/ && make down-clear) && (cd ./tasks/ && make down-clear) && make down-clear
+	(cd ./auth/ && make down-clear) && (cd ./tasks/ && make down-clear) && make down-clear
 .PHONY: down-clear-all
 
 restart: down up
