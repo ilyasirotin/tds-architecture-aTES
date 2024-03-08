@@ -26,7 +26,7 @@ final class AuthProvider extends AbstractProvider
 
     protected function getDefaultScopes(): array
     {
-        return ['email', 'public_id', 'profile'];
+        return ['profile'];
     }
 
     protected function checkResponse(ResponseInterface $response, $data)
@@ -38,6 +38,6 @@ final class AuthProvider extends AbstractProvider
         dump($response);
         exit;
 
-        return new User();
+//        return new User();
     }
 }

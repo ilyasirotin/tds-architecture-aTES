@@ -19,15 +19,14 @@ security:
               - App\Auth\Authenticator
 
     role_hierarchy:
-      ROLE_USER: [ROLE_EMAIL, ROLE_PROFILE]
-      ROLE_MANAGER: ROLE_EMAIL
+      ROLE_MANAGER: ROLE_USER
       ROLE_ACCOUNTANT: ROLE_MANAGER
       ROLE_ADMIN: [ROLE_MANAGER, ROLE_ACCOUNTANT]
 
     access_control:
-      - { path: ^/login, roles: PUBLIC_ACCESS }
-      - { path: ^/auth/callback, roles: PUBLIC_ACCESS }
-      - { path: ^/, role: ROLE_USER }
+      - { path: '^/login/callback', roles: PUBLIC_ACCESS }
+      - { path: '^/login', roles: PUBLIC_ACCESS }
+      - { path: '^/', roles: ROLE_USER }
 
 when@test:
     security:

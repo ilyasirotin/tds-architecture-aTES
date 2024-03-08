@@ -33,13 +33,18 @@ security:
             logout:
                 path: app_logout
 
+    role_hierarchy:
+      ROLE_MANAGER: ROLE_USER
+      ROLE_ACCOUNTANT: ROLE_MANAGER
+      ROLE_ADMIN: [ROLE_MANAGER, ROLE_ACCOUNTANT]
+
     access_control:
-      - { path: ^/authorize, roles: PUBLIC_ACCESS }
-      - { path: ^/login, role: PUBLIC_ACCESS }
-      - { path: ^/register, role: PUBLIC_ACCESS }
-      - { path: ^/token, role: PUBLIC_ACCESS }
-      - { path: ^/api/user, role: ROLE_OAUTH2_EMAIL }
-      - { path: ^/, role: ROLE_USER }
+      - { path: '^/authorize', roles: PUBLIC_ACCESS }
+      - { path: '^/login', roles: PUBLIC_ACCESS }
+      - { path: '^/register', roles: PUBLIC_ACCESS }
+      - { path: '^/token', roles: PUBLIC_ACCESS }
+      - { path: '^/api/user', roles: ROLE_OAUTH2_PROFILE }
+      - { path: '^/', roles: ROLE_USER }
 
 when@test:
     security:

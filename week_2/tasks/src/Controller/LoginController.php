@@ -8,17 +8,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AuthController extends AbstractController
+class LoginController extends AbstractController
 {
-    #[Route('/login', name: 'app_auth')]
+    #[Route('/login', name: 'app_login')]
+    #[Route('/login/', name: 'app_login')]
     public function auth(ClientRegistry $clientRegistry): Response
     {
         return $clientRegistry
             ->getClient('popug_oauth')
-            ->redirect(['email']);
+            ->redirect(['profile']);
     }
 
-    #[Route('/auth/callback', name: 'app_auth_callback')]
+    #[Route('/login/callback', name: 'app_login_callback')]
+    #[Route('/login/callback/', name: 'app_login_callback')]
     public function callback(Request $request): Response
     {
         return $this->json($request);
