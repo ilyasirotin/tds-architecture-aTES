@@ -91,6 +91,51 @@ services:
       - internet
       - no-internet
 
+  billing:
+    image:  caddy:2.7.6-alpine
+    restart: on-failure
+    container_name: "billing"
+    volumes:
+      - "./billing/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
+      - "./billing:/app:ro,Z"
+      - "billing-data:/data:rw"
+    ports:
+      - "8082:80"
+    networks:
+      - no-internet
+      - internet
+    depends_on:
+      - billing-php-fpm
+  billing-php-fpm:
+    restart: always
+    image: "billing-php-fpm"
+    container_name: "billing-php-fpm"
+    build:
+      context: "./billing/docker"
+      dockerfile: php-fpm/Dockerfile
+    volumes:
+      - "./billing:/app:rw,Z"
+    depends_on:
+      - billing-db
+    networks:
+      - internet
+      - no-internet
+  billing-db:
+    restart: always
+    container_name: "billing-db"
+    image: postgres:16.2-alpine
+    volumes:
+      - "billing-db-data:/var/lib/postgresql/data:rw"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5434:5432"
+    networks:
+      - internet
+      - no-internet
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     hostname: zookeeper
@@ -102,10 +147,10 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     networks:
       - no-internet
-  broker:
+  kafka:
     image: confluentinc/cp-server:7.5.0
-    hostname: broker
-    container_name: broker
+    hostname: kafka
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -114,12 +159,12 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://broker:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
@@ -130,8 +175,10 @@ services:
 volumes:
   auth-db-data:
   tasks-db-data:
+  billing-db-data:
   auth-data:
   tasks-data:
+  billing-data:
 
 networks:
   no-internet:
