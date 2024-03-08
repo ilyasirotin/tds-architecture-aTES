@@ -13,7 +13,7 @@ final class AuthProvider extends AbstractProvider
 
     public function getBaseAuthorizationUrl(): string
     {
-        return 'http://localhost:8080/authorize';
+        return 'http://auth.localhost/authorize';
     }
 
     public function getBaseAccessTokenUrl(array $params): string

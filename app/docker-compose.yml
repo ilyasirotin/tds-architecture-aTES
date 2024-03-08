@@ -1,6 +1,27 @@
 version: "3.9"
 
 services:
+  traefik:
+    restart: on-failure
+    image: traefik:latest
+    container_name: "traefik"
+    volumes:
+      - "./docker/traefik/conf/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./var/log/traefik:/var/log/traefik:rw,Z"
+    ports:
+      - "80:80"
+    networks:
+      - no-internet
+      - internet
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik.entryPoints=http
+      - traefik.http.services.traefik.loadBalancer.server.port=8080
+
   auth:
     image:  caddy:2.7.6-alpine
     restart: on-failure
@@ -9,13 +30,19 @@ services:
       - "./auth/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
       - "./auth:/app:ro,Z"
       - "auth-data:/data:rw"
-    ports:
-      - "8080:80"
+#    ports:
+#      - "8080:80"
     networks:
-      - internet
       - no-internet
+      - traefik-public
     depends_on:
       - auth-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.auth.rule=Host(`auth.localhost`)
+      - traefik.http.routers.auth.entryPoints=http
+      - traefik.http.services.auth.loadBalancer.server.port=80
   auth-php-fpm:
     restart: always
     image: "auth-php-fpm"
@@ -54,13 +81,19 @@ services:
       - "./tasks/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
       - "./tasks:/app:ro,Z"
       - "tasks-data:/data:rw"
-    ports:
-      - "8081:80"
+#    ports:
+#      - "8081:80"
     networks:
+      - traefik-public
       - no-internet
-      - internet
     depends_on:
       - tasks-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.tasks.rule=Host(`tasks.localhost`)
+      - traefik.http.routers.tasks.entryPoints=http
+      - traefik.http.services.tasks.loadBalancer.server.port=80
   tasks-php-fpm:
     restart: always
     image: "tasks-php-fpm"
@@ -99,13 +132,19 @@ services:
       - "./billing/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
       - "./billing:/app:ro,Z"
       - "billing-data:/data:rw"
-    ports:
-      - "8082:80"
+#    ports:
+#      - "8082:80"
     networks:
+      - traefik-public
       - no-internet
-      - internet
     depends_on:
       - billing-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.billing.rule=Host(`billing.localhost`)
+      - traefik.http.routers.billing.entryPoints=http
+      - traefik.http.services.billing.loadBalancer.server.port=80
   billing-php-fpm:
     restart: always
     image: "billing-php-fpm"
@@ -185,3 +224,4 @@ networks:
     internal: true
   internet:
     internal: false
+  traefik-public:

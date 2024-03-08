@@ -29,12 +29,12 @@ oauth2-gen-keys:
 oauth2-create-clients:
 	@echo "TASKS SERVICE OAUTH2 CLIENT CREDENTIALS:"
 	@$(DOCKER_COMPOSE) exec auth-php-fpm php bin/console league:oauth2-server:create-client \
-		--redirect-uri=http://localhost:8081/login/callback \
+		--redirect-uri=http://tasks.localhost/login/callback \
 		--grant-type=authorization_code --scope='profile' \
         tasks_auth_client
 	@echo "BILLING SERVICE OAUTH2 CLIENT CREDENTIALS:"
 	@$(DOCKER_COMPOSE) exec auth-php-fpm php bin/console league:oauth2-server:create-client \
-		--redirect-uri=http://localhost:8082/login/callback \
+		--redirect-uri=http://billing.localhost/login/callback \
 		--grant-type=authorization_code --scope='profile' \
         billing_auth_client
 .PHONY: oauth2-create-clients
