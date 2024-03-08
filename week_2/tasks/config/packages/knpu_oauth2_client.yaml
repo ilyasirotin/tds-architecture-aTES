@@ -1,9 +1,0 @@
-knpu_oauth2_client:
-    clients:
-        popug_oauth:
-          type: generic
-          provider_class: App\Auth\AuthProvider
-          client_id: '%env(OAUTH2_CLIENT_ID)%'
-          client_secret: '%env(OAUTH2_CLIENT_SECRET)%'
-          redirect_route: app_login_callback
-          redirect_params: {}
