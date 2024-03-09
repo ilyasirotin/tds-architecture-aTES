@@ -19,3 +19,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    App\Application\Services\RegisterUserService:
+      arguments:
+        $producer: '@enqueue.client.data_streaming.producer'
