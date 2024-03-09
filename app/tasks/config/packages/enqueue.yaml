@@ -1,0 +1,9 @@
+enqueue:
+  data_streaming:
+    transport: '%env(resolve:ENQUEUE_DSN)%'
+    client:
+      prefix: stream
+      app_name: auth
+      router_topic: account
+      router_queue: account
+      default_queue: account
