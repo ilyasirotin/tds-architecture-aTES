@@ -49,6 +49,10 @@ composer-install:
 	$(DOCKER_COMPOSE) run --rm billing-php-fpm composer install
 .PHONY: composer-install
 
+start-consumers:
+	$(DOCKER_COMPOSE) exec -d tasks-php-fpm php bin/console enqueue:consume --setup-broker
+.PHONY: start-consumers
+
 build:
 	$(DOCKER_COMPOSE) build && docker image prune --force
 .PHONY: build
@@ -58,7 +62,7 @@ up:
 .PHONY: up
 
 down:
-	$(DOCKER_COMPOSE) down --remove-orphans
+	$(DOCKER_COMPOSE) down
 .PHONY: down
 
 down-clear:

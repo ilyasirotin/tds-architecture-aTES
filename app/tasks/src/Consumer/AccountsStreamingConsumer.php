@@ -24,7 +24,7 @@ final class AccountsStreamingConsumer implements Processor, TopicSubscriberInter
         $this->service = $service;
     }
 
-    public function process(Message $message, Context $context): void
+    public function process(Message $message, Context $context): string
     {
         $payload = $message->getBody();
         $user = $this->serializer->deserialize($payload, User::class, 'json');
@@ -32,6 +32,8 @@ final class AccountsStreamingConsumer implements Processor, TopicSubscriberInter
         $this->service->execute(
             new HandleUserData($user)
         );
+
+        return self::ACK;
     }
 
     public static function getSubscribedTopics(): array
