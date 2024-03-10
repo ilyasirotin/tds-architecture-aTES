@@ -51,6 +51,7 @@ composer-install:
 
 start-consumers:
 	$(DOCKER_COMPOSE) exec -d tasks-php-fpm php bin/console enqueue:consume --setup-broker
+	$(DOCKER_COMPOSE) exec -d billing-php-fpm php bin/console enqueue:consume --setup-broker
 .PHONY: start-consumers
 
 build:
@@ -69,7 +70,7 @@ down-clear:
 	$(DOCKER_COMPOSE) down -v --remove-orphans
 .PHONY: down-clear
 
-init: make-env build up composer-install doctrine-migrate fixtures-load oauth2-gen-keys oauth2-create-clients
+init: make-env build up composer-install doctrine-migrate fixtures-load start-consumers
 .PHONY: init
 
 ssh-auth:

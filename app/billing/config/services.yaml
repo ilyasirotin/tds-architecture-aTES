@@ -9,3 +9,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    App\Consumer\AccountsStreamingConsumer:
+      tags:
+        - { name: 'enqueue.topic_subscriber', client: 'accounts_streaming' }

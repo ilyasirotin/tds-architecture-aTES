@@ -33,6 +33,6 @@ final class RegisterUserService implements RegisterUserUseCase
         $serializedUser = $this->serializer->serialize($command->user(),'json');
         $message = new Message($serializedUser);
 
-        $this->producer->sendEvent('account_streaming', $message);
+        $this->producer->sendEvent('accounts_streaming', $message);
     }
 }
