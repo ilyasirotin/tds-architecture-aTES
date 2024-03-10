@@ -12,4 +12,8 @@ services:
 
     App\Consumer\AccountsStreamingConsumer:
       tags:
-        - { name: 'enqueue.topic_subscriber', client: 'accounts_streaming' }
+        - { name: 'enqueue.topic_subscriber', client: 'accounts' }
+
+    App\Application\Service\AddNewTaskService:
+      arguments:
+        $producer: '@enqueue.client.tasks.producer'

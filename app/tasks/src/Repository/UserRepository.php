@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Uid\Uuid;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -43,5 +44,31 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
             return $this->findOneBy(['uuid' => Uuid::fromString($identifier)->toBinary()]);
         }
         return null;
+    }
+
+    /**
+     * @param array<User> $excludedUsers
+     * @param array<string> $excludedRoles
+     * @return array<User>
+     */
+    public function findAssignees(array $excludedUsers, array $excludedRoles): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+
+        $excludedIds = array_reduce($excludedUsers, function ($prev, $user) {
+            /** @var User $user */
+            $prev[] = $user->getId();
+
+            return $prev;
+        }, []);
+
+        // Stupid logic, just for save time
+        return $qb
+            ->from(User::class, 'u')
+            ->select('u')
+            ->where($qb->expr()->notIn('u.id', $excludedIds))
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getResult();
     }
 }
