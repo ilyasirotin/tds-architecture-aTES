@@ -1,0 +1,17 @@
+enqueue:
+  accounts_streaming:
+    transport:
+      dsn: '%env(resolve:ENQUEUE_DSN)%'
+      global:
+        group.id: 'tasks-service'
+        metadata.broker.list: '%env(resolve:KAFKA_BROKER_LIST)%'
+        allow.auto.create.topics: 'true'
+      topic:
+        auto.offset.reset: earliest
+      commit_async: true
+    client:
+      prefix: stream
+      app_name: auth
+      router_topic: accounts
+      router_queue: accounts
+      default_queue: accounts
