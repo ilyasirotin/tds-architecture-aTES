@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello IndexController!{% endblock %}
+
+{% block body %}
+    <p>Your public id is: <b>{{ app.user.publicId }}</b></p>
+    <p><a href="{{ path('app_logout') }}">Logout</a></p>
+{% endblock %}

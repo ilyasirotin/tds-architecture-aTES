@@ -1,0 +1,275 @@
+version: "3.9"
+
+services:
+  traefik:
+    restart: on-failure
+    image: traefik:latest
+    container_name: "traefik"
+    volumes:
+      - "./docker/traefik/conf/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./var/log/traefik:/var/log/traefik:rw,Z"
+    ports:
+      - "80:80"
+    networks:
+      - no-internet
+      - internet
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik.entryPoints=http
+      - traefik.http.services.traefik.loadBalancer.server.port=8080
+
+  auth:
+    image:  caddy:2.7.6-alpine
+    restart: on-failure
+    container_name: "auth"
+    volumes:
+      - "./auth/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
+      - "./auth:/app:ro,Z"
+      - "auth-data:/data:rw"
+#    ports:
+#      - "8080:80"
+    networks:
+      - no-internet
+      - traefik-public
+    depends_on:
+      - auth-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.auth.rule=Host(`auth.localhost`)
+      - traefik.http.routers.auth.entryPoints=http
+      - traefik.http.services.auth.loadBalancer.server.port=80
+  auth-php-fpm:
+    restart: always
+    image: "auth-php-fpm"
+    container_name: "auth-php-fpm"
+    build:
+      context: "./auth/docker"
+      dockerfile: php-fpm/Dockerfile
+    volumes:
+      - "./auth:/app:rw,Z"
+    depends_on:
+      - auth-db
+    networks:
+      - internet
+      - no-internet
+  auth-db:
+    restart: always
+    container_name: "auth-db"
+    image: postgres:16.2-alpine
+    volumes:
+      - "auth-db-data:/var/lib/postgresql/data:rw"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    networks:
+      - internet
+      - no-internet
+
+  tasks:
+    image:  caddy:2.7.6-alpine
+    restart: on-failure
+    container_name: "tasks"
+    volumes:
+      - "./tasks/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
+      - "./tasks:/app:ro,Z"
+      - "tasks-data:/data:rw"
+#    ports:
+#      - "8081:80"
+    networks:
+      - traefik-public
+      - no-internet
+    depends_on:
+      - tasks-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.tasks.rule=Host(`tasks.localhost`)
+      - traefik.http.routers.tasks.entryPoints=http
+      - traefik.http.services.tasks.loadBalancer.server.port=80
+  tasks-php-fpm:
+    restart: always
+    image: "tasks-php-fpm"
+    container_name: "tasks-php-fpm"
+    build:
+      context: "./tasks/docker"
+      dockerfile: php-fpm/Dockerfile
+    volumes:
+      - "./tasks:/app:rw,Z"
+    depends_on:
+      - tasks-db
+    networks:
+      - internet
+      - no-internet
+  tasks-db:
+    restart: always
+    container_name: "tasks-db"
+    image: postgres:16.2-alpine
+    volumes:
+      - "tasks-db-data:/var/lib/postgresql/data:rw"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5433:5432"
+    networks:
+      - internet
+      - no-internet
+
+  billing:
+    image:  caddy:2.7.6-alpine
+    restart: on-failure
+    container_name: "billing"
+    volumes:
+      - "./billing/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
+      - "./billing:/app:ro,Z"
+      - "billing-data:/data:rw"
+#    ports:
+#      - "8082:80"
+    networks:
+      - traefik-public
+      - no-internet
+    depends_on:
+      - billing-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.billing.rule=Host(`billing.localhost`)
+      - traefik.http.routers.billing.entryPoints=http
+      - traefik.http.services.billing.loadBalancer.server.port=80
+  billing-php-fpm:
+    restart: always
+    image: "billing-php-fpm"
+    container_name: "billing-php-fpm"
+    build:
+      context: "./billing/docker"
+      dockerfile: php-fpm/Dockerfile
+    volumes:
+      - "./billing:/app:rw,Z"
+    depends_on:
+      - billing-db
+    networks:
+      - internet
+      - no-internet
+  billing-db:
+    restart: always
+    container_name: "billing-db"
+    image: postgres:16.2-alpine
+    volumes:
+      - "billing-db-data:/var/lib/postgresql/data:rw"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5434:5432"
+    networks:
+      - internet
+      - no-internet
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - no-internet
+  kafka:
+    image: confluentinc/cp-server:7.5.0
+    hostname: kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    networks:
+      - no-internet
+  init-kafka:
+    image: confluentinc/cp-server:7.5.0
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka:29092 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic stream.auth.accounts --replication-factor 1 --partitions 1
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
+    networks:
+      - no-internet
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.5.0
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      - kafka
+#      - schema-registry
+#      - connect
+#      - ksqldb-server
+    networks:
+      - no-internet
+      - internet
+      - traefik-public
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:29092'
+#      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: 'connect:8083'
+#      CONTROL_CENTER_KSQL_KSQLDB1_URL: "http://ksqldb-server:8088"
+#      CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL: "http://localhost:8088"
+#      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      PORT: 9021
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.kafka.rule=Host(`kafka.localhost`)
+      - traefik.http.routers.kafka.entryPoints=http
+      - traefik.http.services.kafka.loadBalancer.server.port=9021
+
+volumes:
+  auth-db-data:
+  tasks-db-data:
+  billing-db-data:
+  auth-data:
+  tasks-data:
+  billing-data:
+
+networks:
+  no-internet:
+    internal: true
+  internet:
+    internal: false
+  traefik-public:
