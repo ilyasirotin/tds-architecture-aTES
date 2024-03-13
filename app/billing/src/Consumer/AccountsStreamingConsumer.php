@@ -38,6 +38,6 @@ final class AccountsStreamingConsumer implements Processor, TopicSubscriberInter
 
     public static function getSubscribedTopics(): array
     {
-        return ['accounts_streaming'];
+        return ['accounts_stream'];
     }
 }

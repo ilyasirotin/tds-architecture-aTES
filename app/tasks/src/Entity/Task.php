@@ -19,15 +19,7 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $public_id = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $assignee = null;
+    private ?Uuid $publicId = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
@@ -36,19 +28,27 @@ class Task
     private ?int $status = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 256)]
     private ?string $title = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'author', referencedColumnName: 'id', nullable: false)]
+    private ?User $author = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'assignee', referencedColumnName: 'id', nullable: false)]
+    private ?User $assignee = null;
+
     public function __construct()
     {
-        $this->public_id = Uuid::v7();
-        $this->created_at = new \DateTimeImmutable();
-        $this->updated_at = new \DateTimeImmutable();
+        $this->publicId = Uuid::v7();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
         $this->setStatus(self::TASK_STATUS_CREATED);
     }
 
@@ -66,12 +66,12 @@ class Task
 
     public function getPublicId(): ?Uuid
     {
-        return $this->public_id;
+        return $this->publicId;
     }
 
-    public function setPublicId(Uuid $public_id): static
+    public function setPublicId(Uuid $publicId): static
     {
-        $this->public_id = $public_id;
+        $this->publicId = $publicId;
 
         return $this;
     }
@@ -126,24 +126,24 @@ class Task
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -158,5 +158,10 @@ class Task
         $this->title = $title;
 
         return $this;
+    }
+
+    public function complete(): void
+    {
+        $this->status = self::TASK_STATUS_COMPLETED;
     }
 }

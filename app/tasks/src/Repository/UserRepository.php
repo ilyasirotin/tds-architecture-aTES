@@ -9,7 +9,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Uid\Uuid;
-use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -47,28 +46,31 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     }
 
     /**
-     * @param array<User> $excludedUsers
      * @param array<string> $excludedRoles
      * @return array<User>
      */
-    public function findAssignees(array $excludedUsers, array $excludedRoles): array
+    public function findAssignees(array $excludedRoles): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        $rsm = $this->createResultSetMappingBuilder('u');
 
-        $excludedIds = array_reduce($excludedUsers, function ($prev, $user) {
-            /** @var User $user */
-            $prev[] = $user->getId();
+        // Dummy query just to save time
+        $rawQuery = <<<SQL
+            SELECT %s
+            FROM "user" u
+            WHERE NOT EXISTS(
+                SELECT 1
+                FROM json_array_elements_text(u.roles) r
+                WHERE r IN (:roles)
+            )
+            limit 100;
+        SQL;
 
-            return $prev;
-        }, []);
+        $query = $this->getEntityManager()->createNativeQuery(
+            sprintf($rawQuery, $rsm->generateSelectClause()),
+            $rsm
+        );
+        $query->setParameter('roles', $excludedRoles);
 
-        // Stupid logic, just for save time
-        return $qb
-            ->from(User::class, 'u')
-            ->select('u')
-            ->where($qb->expr()->notIn('u.id', $excludedIds))
-            ->setMaxResults(100)
-            ->getQuery()
-            ->getResult();
+        return $query->getResult();
     }
 }

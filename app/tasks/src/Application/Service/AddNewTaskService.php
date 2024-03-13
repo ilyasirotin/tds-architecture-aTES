@@ -42,11 +42,16 @@ final class AddNewTaskService implements AddNewTaskUseCase
 
         $newTask->setAuthor($author);
 
-        $potentialAssigneeList = $this->users->findAssignees([$author], [
+        $potentialAssigneeList = $this->users->findAssignees([
             'ROLE_MANAGER',
             'ROLE_ADMIN',
             'ROLE_ACCOUNTANT'
         ]);
+
+        if (empty($potentialAssigneeList)) {
+            // TODO: Properly handle exception
+            throw new \Exception('There are no workers yet.');
+        }
 
         $randomAssignee = $potentialAssigneeList[array_rand($potentialAssigneeList)];
         $newTask->setAssignee($randomAssignee);
@@ -57,6 +62,7 @@ final class AddNewTaskService implements AddNewTaskUseCase
             $this->serializer->serialize($newTask, 'json')
         );
 
+        // Produce events to broker
         $this->producer->sendEvent('tasks_stream', $message);
         $this->producer->sendEvent('task_created', $message);
 

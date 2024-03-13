@@ -12,4 +12,4 @@ services:
 
     App\Consumer\AccountsStreamingConsumer:
       tags:
-        - { name: 'enqueue.topic_subscriber', client: 'accounts_streaming' }
+        - { name: 'enqueue.topic_subscriber', client: 'accounts' }

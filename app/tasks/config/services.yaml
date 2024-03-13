@@ -17,3 +17,11 @@ services:
     App\Application\Service\AddNewTaskService:
       arguments:
         $producer: '@enqueue.client.tasks.producer'
+
+    App\Application\Service\CompleteTaskService:
+      arguments:
+        $producer: '@enqueue.client.tasks.producer'
+
+    App\Application\Service\ShuffleTasksService:
+      arguments:
+        $producer: '@enqueue.client.tasks.producer'

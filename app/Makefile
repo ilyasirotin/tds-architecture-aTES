@@ -70,7 +70,7 @@ down-clear:
 	$(DOCKER_COMPOSE) down -v --remove-orphans
 .PHONY: down-clear
 
-init: make-env build up composer-install doctrine-migrate fixtures-load start-consumers
+init: build up composer-install doctrine-migrate fixtures-load start-consumers
 .PHONY: init
 
 ssh-auth:
