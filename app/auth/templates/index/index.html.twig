@@ -3,6 +3,12 @@
 {% block title %}Hello IndexController!{% endblock %}
 
 {% block body %}
-    <p>Your public id is: <b>{{ app.user.publicId }}</b></p>
-    <p><a href="{{ path('app_logout') }}">Logout</a></p>
+    <div class="container-sm d-flex align-items-center justify-content-center vh-100">
+        <div class="col-5">
+            <div class="row justify-content-center">
+                <p>Your public id is: <b>{{ app.user.publicId }}</b></p>
+                <p><a href="{{ path('app_logout') }}">Logout</a></p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
