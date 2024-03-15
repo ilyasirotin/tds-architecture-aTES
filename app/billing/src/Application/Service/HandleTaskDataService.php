@@ -49,8 +49,6 @@ final class HandleTaskDataService implements HandleTaskDataUseCase
 
         $newTask->setCost($cost);
 
-        dump($newTask);
-
         return $this->tasks->add($newTask);
     }
 }
