@@ -41,7 +41,9 @@
                         <td>
                             {# TODO: Refactor task completion action #}
                             {# Pass task id in request query params just for simplicity #}
-                            <a href="{{ path('app_task_complete', {id: task.id}) }}">Complete</a>
+                            {%  if task.status == 0 %}
+                                <a href="{{ path('app_task_complete', {id: task.id}) }}">Complete</a>
+                            {% endif %}
                         </td>
                     {% else %}
                         <td></td>

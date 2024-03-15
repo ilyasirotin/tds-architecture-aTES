@@ -40,7 +40,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
             return $this->findOneBy(['email' => $identifier]);
         }
         if (Uuid::isValid($identifier)) {
-            return $this->findOneBy(['uuid' => Uuid::fromString($identifier)->toBinary()]);
+            return $this->findOneBy(['publicId' => Uuid::fromString($identifier)->toBinary()]);
         }
         return null;
     }

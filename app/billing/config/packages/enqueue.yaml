@@ -22,6 +22,9 @@ enqueue:
         group.id: 'billing-service'
         metadata.broker.list: '%env(resolve:KAFKA_BROKER_LIST)%'
         allow.auto.create.topics: 'true'
+      topic:
+        auto.offset.reset: earliest
+      commit_async: true
     client:
       prefix: events
       app_name: tasks

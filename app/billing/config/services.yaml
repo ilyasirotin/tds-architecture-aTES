@@ -13,3 +13,7 @@ services:
     App\Consumer\AccountsStreamingConsumer:
       tags:
         - { name: 'enqueue.topic_subscriber', client: 'accounts' }
+
+    App\Consumer\TaskStreamingConsumer:
+      tags:
+        - { name: 'enqueue.topic_subscriber', client: 'tasks' }
