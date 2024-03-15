@@ -52,6 +52,7 @@ composer-install:
 start-consumers:
 	$(DOCKER_COMPOSE) exec -d tasks-php-fpm php bin/console enqueue:consume --setup-broker
 	$(DOCKER_COMPOSE) exec -d billing-php-fpm php bin/console enqueue:consume --setup-broker
+	$(DOCKER_COMPOSE) exec -d billing-php-fpm php bin/console enqueue:consume --setup-broker --client=tasks
 .PHONY: start-consumers
 
 build:
