@@ -44,7 +44,8 @@ final class CompleteTaskService implements CompleteTaskUseCase
             $this->serializer->serialize($completedTask, 'json')
         );
 
-        // Produce completed task event
+        // Produce task events
+        $this->producer->sendEvent('tasks_stream', $message);
         $this->producer->sendEvent('task_completed', $message);
 
         return $completedTask;

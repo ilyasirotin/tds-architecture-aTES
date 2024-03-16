@@ -10,8 +10,9 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
 {
-    const FEE_WITHDRAW = 'fee_withdraw';
-    const FUNDS_DISBURSEMENT = 'funds_disbursement';
+    const WITHDRAW = 'withdraw';
+    const ENROLL = 'enroll';
+    const DISBURSEMENT = 'disbursement';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,10 +38,10 @@ class Transaction
     #[ORM\JoinColumn(name: 'payment', referencedColumnName: 'id')]
     private ?Payment $payment = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
     private ?string $credit = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
     private ?string $debit = null;
 
     #[ORM\Column(length: 256)]

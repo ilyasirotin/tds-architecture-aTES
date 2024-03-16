@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: BillingCycleRepository::class)]
 class BillingCycle
 {
-    const OPENED = 'opened';
+    const ACTIVE = 'active';
     const CLOSED = 'closed';
 
     #[ORM\Id]
@@ -32,6 +32,7 @@ class BillingCycle
 
     public function __construct()
     {
+        $this->status = self::ACTIVE;
         $this->createdAt = new \DateTimeImmutable();
     }
 

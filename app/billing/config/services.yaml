@@ -17,3 +17,7 @@ services:
     App\Consumer\TaskStreamingConsumer:
       tags:
         - { name: 'enqueue.topic_subscriber', client: 'tasks' }
+
+    App\Consumer\TaskLifecycleConsumer:
+      tags:
+        - { name: 'enqueue.topic_subscriber', client: 'tasks' }

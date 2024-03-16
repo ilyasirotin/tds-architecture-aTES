@@ -43,6 +43,10 @@ fixtures-load:
 	$(DOCKER_COMPOSE) exec auth-php-fpm php bin/console doctrine:fixtures:load --append
 .PHONY: fixtures-load
 
+bootstrap-app:
+	$(DOCKER_COMPOSE) exec auth-php-fpm php bin/console app:create-users
+.PHONY: bootstrap-app
+
 composer-install:
 	$(DOCKER_COMPOSE) run --rm auth-php-fpm composer install
 	$(DOCKER_COMPOSE) run --rm tasks-php-fpm composer install
@@ -70,7 +74,7 @@ down-clear:
 	$(DOCKER_COMPOSE) down -v --remove-orphans
 .PHONY: down-clear
 
-init: build up composer-install doctrine-migrate fixtures-load start-consumers
+init: build up composer-install doctrine-migrate fixtures-load start-consumers bootstrap-app
 .PHONY: init
 
 ssh-auth:

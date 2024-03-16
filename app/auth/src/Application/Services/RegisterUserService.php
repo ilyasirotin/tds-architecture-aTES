@@ -26,7 +26,7 @@ final class RegisterUserService implements RegisterUserUseCase
         $this->serializer = $serializer;
     }
 
-    public function execute(RegisterUserCommand $command): void
+    public function execute(RegisterUser $command): void
     {
         $this->users->add($command->user());
 

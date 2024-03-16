@@ -21,28 +21,17 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
-//    /**
-//     * @return Payment[] Returns an array of Payment objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(Payment $payment): Payment
+    {
+        return $this->save($payment);
+    }
 
-//    public function findOneBySomeField($value): ?Payment
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    private function save(Payment $payment): Payment
+    {
+        $this->getEntityManager()->persist($payment);
+        $this->getEntityManager()->flush();
+
+        return $payment;
+    }
+
 }

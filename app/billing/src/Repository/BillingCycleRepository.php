@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\BillingCycle;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +22,24 @@ class BillingCycleRepository extends ServiceEntityRepository
         parent::__construct($registry, BillingCycle::class);
     }
 
-//    /**
-//     * @return BillingCycle[] Returns an array of BillingCycle objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(BillingCycle $cycle): BillingCycle
+    {
+        return $this->save($cycle);
+    }
 
-//    public function findOneBySomeField($value): ?BillingCycle
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findActiveForOwner(User $owner): ?BillingCycle
+    {
+        return $this->findOneBy([
+            'owner' => $owner->getId(),
+            'status' => BillingCycle::ACTIVE
+        ], ['createdAt' => 'DESC']);
+    }
+
+    private function save(BillingCycle $cycle): BillingCycle
+    {
+        $this->getEntityManager()->persist($cycle);
+        $this->getEntityManager()->flush();
+
+        return $cycle;
+    }
 }

@@ -52,6 +52,7 @@ final class ShuffleTasksService implements ShuffleTasksUseCase
         );
 
         // Produce event to broker
+        $this->producer->sendEvent('tasks_stream', $message);
         $this->producer->sendEvent('task_shuffled', $message);
 
         return $shuffledTask;
