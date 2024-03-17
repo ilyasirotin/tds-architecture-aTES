@@ -191,6 +191,65 @@ services:
       - internet
       - no-internet
 
+  analytics:
+    image:  caddy:2.7.6-alpine
+    restart: on-failure
+    container_name: "analytics"
+    volumes:
+      - "./analytics/docker/caddy/conf/Caddyfile:/etc/caddy/Caddyfile:ro,Z"
+      - "./analytics:/app:ro,Z"
+      - "analytics-data:/data:rw"
+    #    ports:
+    #      - "8083:80"
+    networks:
+      - traefik-public
+      - no-internet
+    depends_on:
+      - analytics-php-fpm
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.analytics.rule=Host(`analytics.localhost`)
+      - traefik.http.routers.analytics.entryPoints=http
+      - traefik.http.services.analytics.loadBalancer.server.port=80
+  analytics-php-fpm:
+    restart: always
+    image: "analytics-php-fpm"
+    container_name: "analytics-php-fpm"
+    build:
+      context: "./billing/docker"
+      dockerfile: php-fpm/Dockerfile
+    volumes:
+      - "./analytics/docker/php-fpm/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:ro,Z"
+      - "./analytics:/app:rw,Z"
+    depends_on:
+      - analytics-db
+    networks:
+      - internet
+      - no-internet
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.analytics-supervisor.rule=Host(`analytics-spv.localhost`)
+      - traefik.http.routers.analytics-supervisor.entryPoints=http
+      - traefik.http.services.analytics-supervisor.loadBalancer.server.port=9001
+  analytics-db:
+    restart: always
+    container_name: "analytics-db"
+    image: postgres:16.2-alpine
+    volumes:
+      - "analytics-db-data:/var/lib/postgresql/data:rw"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5435:5432"
+    networks:
+      - internet
+      - no-internet
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     hostname: zookeeper
@@ -208,8 +267,6 @@ services:
     container_name: kafka
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -280,9 +337,11 @@ volumes:
   auth-db-data:
   tasks-db-data:
   billing-db-data:
+  analytics-db-data:
   auth-data:
   tasks-data:
   billing-data:
+  analytics-data:
 
 networks:
   no-internet:

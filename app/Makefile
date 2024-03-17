@@ -12,12 +12,14 @@ make-env:
 	@cp -n ./auth/.env.tmpl ./auth/.env
 	@cp -n ./tasks/.env.tmpl ./tasks/.env
 	@cp -n ./billing/.env.tmpl ./billing/.env
+	@cp -n ./analytics/.env.tmpl ./analytics/.env
 .PHONY: make-env
 
 doctrine-migrate:
 	$(DOCKER_COMPOSE) exec auth-php-fpm php bin/console doctrine:migrations:migrate --no-interaction
 	$(DOCKER_COMPOSE) exec tasks-php-fpm php bin/console doctrine:migrations:migrate --no-interaction
 	$(DOCKER_COMPOSE) exec billing-php-fpm php bin/console doctrine:migrations:migrate --no-interaction
+	$(DOCKER_COMPOSE) exec analytics-php-fpm php bin/console doctrine:migrations:migrate --no-interaction
 .PHONY: doctrine-migrate
 
 oauth2-gen-keys:
@@ -37,6 +39,11 @@ oauth2-create-clients:
 		--redirect-uri=http://billing.localhost/login/callback \
 		--grant-type=authorization_code --scope='profile' \
         billing_auth_client
+	@echo "ANALYTICS SERVICE OAUTH2 CLIENT CREDENTIALS:"
+	@$(DOCKER_COMPOSE) exec auth-php-fpm php bin/console league:oauth2-server:create-client \
+		--redirect-uri=http://analytics.localhost/login/callback \
+		--grant-type=authorization_code --scope='profile' \
+        analytics_auth_client
 .PHONY: oauth2-create-clients
 
 fixtures-load:
@@ -51,11 +58,13 @@ composer-install:
 	$(DOCKER_COMPOSE) run --rm auth-php-fpm composer install
 	$(DOCKER_COMPOSE) run --rm tasks-php-fpm composer install
 	$(DOCKER_COMPOSE) run --rm billing-php-fpm composer install
+	$(DOCKER_COMPOSE) run --rm analytics-php-fpm composer install
 .PHONY: composer-install
 
 start-consumers:
 	$(DOCKER_COMPOSE) exec -d tasks-php-fpm supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
 	$(DOCKER_COMPOSE) exec -d billing-php-fpm supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
+	$(DOCKER_COMPOSE) exec -d analytics-php-fpm supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
 .PHONY: start-consumers
 
 build:
@@ -87,4 +96,7 @@ ssh-tasks:
 
 ssh-billing:
 	$(DOCKER_COMPOSE) exec -it billing-php-fpm sh
-.PHONY: ssh-billing
+
+ssh-analytics:
+	$(DOCKER_COMPOSE) exec -it analytics-php-fpm sh
+.PHONY: ssh-analytics

@@ -42,6 +42,16 @@ final class Oauth2ClientFixtures extends Fixture
                  'profile',
                  true,
                  false
+                ),
+                (
+                 'c0a3e67d6fd68e74824cf167c22a4552',
+                 'analytics_auth_client',
+                 '401da263381c4d0ce6415f4a83a72e1ec18691ca86bafb3c6588e3f167e26d0cbe4d29801d90d78a6071b6f6111f4a01a578b83c8c147b00e95d510700d7da4c',
+                 'http://analytics.localhost/login/callback',
+                 'authorization_code',
+                 'profile',
+                 true,
+                 false
                 );
         ";
 
