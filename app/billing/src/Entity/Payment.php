@@ -6,7 +6,6 @@ use App\Repository\PaymentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 class Payment
@@ -152,6 +151,22 @@ class Payment
         }
 
         $this->transaction = $transaction;
+
+        return $this;
+    }
+
+    public function processing(): self
+    {
+        $this->setStatus(self::IN_PROGRESS);
+        $this->updatedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function complete(): self
+    {
+        $this->setStatus(self::COMPLETED);
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }

@@ -26,6 +26,11 @@ class AccountRepository extends ServiceEntityRepository
         return $this->save($account);
     }
 
+    public function update(Account $account): Account
+    {
+        return $this->save($account);
+    }
+
     private function save(Account $account): Account
     {
         $this->getEntityManager()->persist($account);

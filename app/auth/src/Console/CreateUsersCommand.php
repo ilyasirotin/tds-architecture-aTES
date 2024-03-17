@@ -17,10 +17,10 @@ use Symfony\Component\Uid\Uuid;
 #[AsCommand(
     name: 'app:create-users',
     description: 'Creates default users',
-    hidden: false,
-    aliases: ['app:add-users']
+    aliases: ['app:add-users'],
+    hidden: false
 )]
-class CreateUsersCommand extends Command
+final class CreateUsersCommand extends Command
 {
     private UserPasswordHasherInterface $passwordHasher;
     private RegisterUserUseCase $service;

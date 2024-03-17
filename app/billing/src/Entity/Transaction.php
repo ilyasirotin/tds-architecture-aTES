@@ -11,7 +11,7 @@ use Symfony\Component\Uid\Uuid;
 class Transaction
 {
     const WITHDRAW = 'withdraw';
-    const ENROLL = 'enroll';
+    const DEPOSIT = 'deposit';
     const DISBURSEMENT = 'disbursement';
 
     #[ORM\Id]
@@ -26,11 +26,7 @@ class Transaction
     #[ORM\JoinColumn(name: 'account', referencedColumnName: 'id', nullable: false)]
     private ?Account $account = null;
 
-    #[ORM\ManyToOne(targetEntity: Task::class)]
-    #[ORM\JoinColumn(name: 'task', referencedColumnName: 'id', nullable: false)]
-    private ?Task $task = null;
-
-    #[ORM\ManyToOne(targetEntity: BillingCycle::class, inversedBy: 'transactions')]
+    #[ORM\ManyToOne(targetEntity: BillingCycle::class, cascade: ['persist'], inversedBy: 'transactions')]
     #[ORM\JoinColumn(name: 'billing_cycle', referencedColumnName: 'id', nullable: false)]
     private ?BillingCycle $billingCycle = null;
 
@@ -49,6 +45,9 @@ class Transaction
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $description = null;
 
     public function __construct()
     {
@@ -69,18 +68,6 @@ class Transaction
     public function setAccount(?Account $account): static
     {
         $this->account = $account;
-
-        return $this;
-    }
-
-    public function getTask(): ?Task
-    {
-        return $this->task;
-    }
-
-    public function setTask(?Task $task): static
-    {
-        $this->task = $task;
 
         return $this;
     }
@@ -165,6 +152,18 @@ class Transaction
     public function setPublicId(Uuid $publicId): static
     {
         $this->publicId = $publicId;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -4,27 +4,33 @@ declare(strict_types=1);
 
 namespace App\Application\Service;
 
-use App\Entity\Task;
+use App\Entity\Account;
 
 final class TransactionApply
 {
+    private Account $account;
     private string $type;
+    private string $amount;
 
-    private Task $task;
-
-    public function __construct(Task $task, string $type)
+    public function __construct(Account $account, string $type, string $amount)
     {
-        $this->task = $task;
+        $this->account = $account;
         $this->type = $type;
+        $this->amount = $amount;
     }
 
-    public function task(): Task
+    public function account(): Account
     {
-        return $this->task;
+        return $this->account;
     }
 
     public function type(): string
     {
         return $this->type;
+    }
+
+    public function amount(): string
+    {
+        return $this->amount;
     }
 }

@@ -19,20 +19,22 @@ class BillingCycle
     #[ORM\Column(length: 255)]
     private ?string $status = null;
 
-    #[ORM\OneToOne(targetEntity: Payment::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'payment', referencedColumnName: 'id')]
-    private ?Payment $payment = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'owner', referencedColumnName: 'id', nullable: false)]
-    private ?User $owner = null;
+    #[ORM\ManyToOne(targetEntity: Account::class)]
+    #[ORM\JoinColumn(name: 'account', referencedColumnName: 'id', nullable: false)]
+    private ?Account $account = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $startDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $endDate = null;
 
     public function __construct()
     {
-        $this->status = self::ACTIVE;
+        $this->open();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -60,18 +62,6 @@ class BillingCycle
         return $this;
     }
 
-    public function getPayment(): ?Payment
-    {
-        return $this->payment;
-    }
-
-    public function setPayment(?Payment $payment): static
-    {
-        $this->payment = $payment;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -84,14 +74,54 @@ class BillingCycle
         return $this;
     }
 
-    public function getOwner(): ?User
+    public function getAccount(): ?Account
     {
-        return $this->owner;
+        return $this->account;
     }
 
-    public function setOwner(?User $owner): static
+    public function setAccount(?Account $account): static
     {
-        $this->owner = $owner;
+        $this->account = $account;
+
+        return $this;
+    }
+
+    public function getStartDate(): ?\DateTimeImmutable
+    {
+        return $this->startDate;
+    }
+
+    public function setStartDate(\DateTimeImmutable $startDate): static
+    {
+        $this->startDate = $startDate;
+
+        return $this;
+    }
+
+    public function getEndDate(): ?\DateTimeImmutable
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?\DateTimeImmutable $endDate): static
+    {
+        $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    public function open(): self
+    {
+        $this->setStatus(self::ACTIVE);
+        $this->setStartDate(new \DateTimeImmutable());
+
+        return $this;
+    }
+
+    public function close(): self
+    {
+        $this->setStatus(self::CLOSED);
+        $this->setEndDate(new \DateTimeImmutable());
 
         return $this;
     }

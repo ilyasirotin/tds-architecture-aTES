@@ -24,6 +24,8 @@ class IndexController extends AbstractController
     #[Route('/', name: 'app_index')]
     public function index(): Response
     {
+        // TODO: Implement dashboard views for the top-management and admins
+
         /** @var User $user */
         $user = $this->security->getUser();
 
